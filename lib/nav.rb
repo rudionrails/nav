@@ -5,7 +5,8 @@ module Nav
   def nav( options = {}, &block )
     builder = Builder.new( self, options )
     yield( builder )
-    concat( builder.to_html ).html_safe if builder.actions?
+
+    builder.to_html if builder.actions?
   end
 
   
@@ -36,7 +37,7 @@ module Nav
     def actions?; @actions.any?; end
 
     def to_html
-      content_tag :ul, actions.html_safe, @options
+      content_tag( :ul, actions.html_safe, @options ).html_safe
     end
 
 
