@@ -7,7 +7,7 @@ begin
 rescue LoadError
   STDERR.puts "Unable to run Nav tests."
 else
-  require File.dirname(__FILE__) + "/../rails/init"
+  require File.dirname(__FILE__) + "/../init"
 end
 
 
