@@ -99,3 +99,5 @@ module Nav
   end
 
 end
+
+ActionView::Base.send :include, Nav
