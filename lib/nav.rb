@@ -74,6 +74,7 @@ module Nav
       is_current = case current
         when TrueClass then true
         when Regexp then request_uri.match(current).nil? ? false : true
+        when Proc then current.call
         else false
       end
 
