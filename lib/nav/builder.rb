@@ -23,7 +23,7 @@ module Nav
       @actions << [link_to(name, options, html_options), wrapper_options, options]
     end
 
-    def nav( options = {}i, &block )
+    def nav( options = {}, &block )
       Nav::Builder.new( @template, options, &block )
     end
 
