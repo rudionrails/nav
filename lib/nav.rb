@@ -1,5 +1,3 @@
-require_relative "nav/version"
-
 module Nav
 
   def nav( options = {}, &block )
@@ -13,14 +11,12 @@ module Nav
   private
 
   class Builder
-
     def initialize( template, options = {} )
       @template, @options = template, options
 
       @actions = []
     end
 
-    
     def action( name, options = {}, html_options = {} )
       wrapper_options = {
         :current => html_options.delete(:current),
@@ -96,9 +92,9 @@ module Nav
     def link_to( *args )
       @template.link_to( *args ).html_safe
     end
-    
   end
 
 end
 
 ActionView::Base.send :include, Nav
+

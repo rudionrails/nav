@@ -1,0 +1,38 @@
+= Nav
+Navigation made easy
+
+== Installation
+  # system wide
+  gem install nav
+
+  # in your Gemfile
+  gem 'nav'
+
+== Usage
+Nav is automatically available within ActionView::Base and can be used like so:
+  <%= nav do |n| %>
+    <% n.action "Home", "/" %>
+    <% n.action "Login", login_url %>
+  <% end %>
+
+  # When rendered, this generates the following:
+  <ul>
+    <li class="first current first_current">
+      <a href="/">Home</a>
+    </li>
+    <li class="last after_current last_after_current">
+      <a href="/login">Login</a>
+    </li>
+  </ul>
+
+You can give any possible html option, like classes, etc.
+  <%= nav :class => 'main' %>
+    ...
+  <% end %>
+
+  # results in
+  <ul class='main'>
+    ...
+  </ul>
+
+Copyright (c) 2011 Rudolf Schmidt, released under the MIT license
