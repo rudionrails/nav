@@ -9,6 +9,7 @@ Navigation made easy
   gem 'nav'
 
 == Usage
+=== Basics
 Nav is automatically available within ActionView::Base and can be used like so:
   <%= nav do |n| %>
     <% n.action "Home", "/" %>
@@ -25,8 +26,14 @@ Nav is automatically available within ActionView::Base and can be used like so:
     </li>
   </ul>
 
-You can give any possible html option, like classes, etc.
-  <%= nav :class => 'main' %>
+It will determine the current page you are on and add the :current: class to the <li> element. Also, 
+the element before and after the current element have the classes :before_current: and :after_current:. 
+Additionally, Nav will mark the first and last <li> element of the list as :first: and :last:. Like so, 
+you can apply styles accordingly.
+
+=== Adding attributes to the nav element
+You can give any possible html option to nav, like classes, etc.
+  <%= nav :class => 'main' do |n| %>
     ...
   <% end %>
 
@@ -34,5 +41,34 @@ You can give any possible html option, like classes, etc.
   <ul class='main'>
     ...
   </ul>
+
+=== Adding attributes to an action
+You are able to add specific behaviour when defining an :action. For instance, if you want to disable a specific 
+element, you may pass :disabled: to it:
+  <%= nav do |n| %>
+    <%= n.action "Disabled", "/", :disabled => true %>
+  <% end %>
+
+This will add a "disabled" class to the <li> element. 
+
+Sometimes you may want to define yourself which of the elements is the current one. You can pass :current: as
+option. This can be done in various ways.
+  # Pass true or false to the :current: argument
+  <%= nav do |n| %>
+   <% n.action "My special current", "/", :current => true %>
+  <% end %>
+  
+  # Pass a regular expression to the :current: argument. For instance, the following will mark any url as current
+  # that has "account", followed by a "/" and any typee of numeric value: 
+  <%= nav do |n| %>
+   <% n.action "My special current", "/", :current => /account\/\d+/ %>
+  <% end %>
+
+  # Lastly, you may also pass a proc:
+  <%= nav do |n| %>
+   <% n.action "My special current", "/", :current => Proc.new { !current_user.nil? } %>
+  <% end %>
+
+
 
 Copyright (c) 2011 Rudolf Schmidt, released under the MIT license
