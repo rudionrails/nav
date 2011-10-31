@@ -2,12 +2,9 @@ module Nav
   class Builder
     def initialize( template, options = {} )
       @template, @options = template, options
-
       @actions = []
-
-      yield if block_given?
-
-      to_html if actions?
+      
+      yield self if block_given?
     end
 
     def action( name, options = {}, html_options = {} )
@@ -23,21 +20,19 @@ module Nav
       @actions << [link_to(name, options, html_options), wrapper_options, options]
     end
 
-    def nav( options = {}, &block )
-      Nav::Builder.new( @template, options, &block )
-    end
-
-    def actions?; @actions.any?; end
-
-    def to_html
-      content_tag( :ul, actions.html_safe, @options ).html_safe
+    def to_s
+      content_tag( :ul, actions.html_safe, @options ).html_safe if actions?
     end
 
 
     private
 
     def actions
-      @actions.collect{ |a| action_wrapper(*a) }.join
+      @actions.collect { |a| action_wrapper(*a) }.join
+    end
+
+    def actions?
+      @actions.any?
     end
 
     def action_wrapper( contents, options = {}, url_for_options = {} )
