@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Nav::VERSION
   s.authors     = ["Rudolf Schmidt"]
 
-  s.homepage    = ""
+  s.homepage    = "http://rubygems.org/gems/nav"
   s.summary     = %q{Simple nagivation builder}
   s.description = %q{Simple nagivation builder}
 
