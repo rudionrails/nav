@@ -72,17 +72,20 @@ module Nav
       false
     end
 
-    def request_uri
-      @request_uri or @request_uri = @template.request.request_uri
-    end
-
-
     def content_tag( *args )
       @template.content_tag( *args ).html_safe
     end
 
     def link_to( *args )
       @template.link_to( *args ).html_safe
+    end
+
+    def request_uri
+      @request_uri or @request_uri = request.respond_to?(:request_uri) ? request.request_uri : request.url
+    end
+
+    def request
+      @template.request
     end
   end
 end
