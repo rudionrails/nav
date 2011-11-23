@@ -1,17 +1,11 @@
 require 'minitest/autorun'
 
+require 'action_view'
+require 'rr'
 
-begin
-  require 'action_view'
-  require 'rr'
-rescue LoadError
-  STDERR.puts "Unable to run Nav tests."
-else
-  require File.dirname(__FILE__) + "/../lib/nav"
-end
+require File.dirname(__FILE__) + "/../lib/nav"
 
+class MiniTest::Spec
+  include RR::Adapters::MiniTest
 
-class MiniTest::Unit::TestCase
-  include RR::Adapters::TestUnit
-  
 end

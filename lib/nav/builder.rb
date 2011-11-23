@@ -1,9 +1,10 @@
 module Nav
   class Builder
+
     def initialize( template, options = {} )
       @template, @options = template, options
       @actions = []
-      
+
       yield self if block_given?
     end
 
@@ -16,7 +17,7 @@ module Nav
         :prepend => html_options.delete(:prepend),
         :append => html_options.delete(:append)
       }
-      
+
       @actions << [link_to(name, options, html_options), wrapper_options, options]
     end
 
@@ -38,7 +39,7 @@ module Nav
     def action_wrapper( contents, options = {}, url_for_options = {} )
       present = [contents, options, url_for_options] # the one we're dealing with
       present_index  = @actions.index( present )
-      
+
       before_present = @actions.at( present_index - 1 ) if present_index > 0
       after_present  = @actions.at( present_index + 1 ) if present_index < @actions.size
 
@@ -58,13 +59,13 @@ module Nav
 
     def current?( contents, options = {}, url_for_options = {} )
       current = options[:current]
-      
+
       is_current = case current
-        when TrueClass then true
-        when Regexp then request_uri.match(current).nil? ? false : true
-        when Proc then current.call
-        else false
-      end
+         when TrueClass then true
+         when Regexp then request_uri.match(current).nil? ? false : true
+         when Proc then current.call
+         else false
+       end
 
       return true if is_current && !options[:disabled] && options[:force_current]
       return true if is_current || !url_for_options.is_a?(Symbol) && @template.current_page?(url_for_options) && url_for_options != {} && !options[:disabled]
@@ -84,6 +85,7 @@ module Nav
     def link_to( *args )
       @template.link_to( *args ).html_safe
     end
+
   end
 end
 

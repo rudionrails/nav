@@ -19,5 +19,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'actionpack', '~> 3'
+
+  s.add_development_dependency 'minitest'
   s.add_development_dependency 'rr'
 end

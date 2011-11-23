@@ -1,11 +1,9 @@
-require_relative 'test_helper'
-puts 'awesome'
+require File.expand_path( File.dirname(__FILE__) + '/test_helper' )
 
 describe Nav do
 
   # <ul id="nav">
   #   <li class="">before <a href="/">test</a></li>
-  #   <li class="">before <a href="#" onclick="new Ajax.Request('/', {asynchronous:true, evalScripts:true, parameters:'authenticity_token=' + encodeURIComponent('7016ef6fd7413d836cd720a6071e22e4f14e0212')}); return false;">test</a></li>
   # </ul>
 
   before do
@@ -15,29 +13,29 @@ describe Nav do
     stub( @view ).current_page? { false }
   end
 
-  it "should display ul" do
-    m = @view.nav(:id => 'my-nav') { |m| m.action('my-link', '/link') }
-    assert_match(/<ul.*id=\"my-nav\">.*<\/ul>/, m)
+  it "should render ul with given html options" do
+    nav = @view.nav(:id => 'my-nav') { |n| n.action('my-link', '/link') }
+    assert_match /<ul.*id=\"my-nav\">.*<\/ul>/, nav.to_s
   end
 
-  it "should display li" do
-    m = @view.nav { |m| m.action('my-link', '/link') }
-    assert_match(/<li.*>.*<\/li>/, m)
+  it "should render li" do
+    nav = @view.nav { |n| n.action('my-link', '/link') }
+    assert_match /<li.*>.*<\/li>/, nav.to_s
   end
 
-  it "should display link" do
-    m = @view.nav { |m| m.action('my-link', '/link') }
-    assert_match(/<a.*href=\"\/link\">my-link<\/a>/, m)
+  it "should render link" do
+    nav = @view.nav { |n| n.action('my-link', '/link') }
+    assert_match /<a.*href=\"\/link\">my-link<\/a>/, nav.to_s
   end
 
-  it "should display :prepend options before the link" do
-    m = @view.nav { |m| m.action('my-link', '/link', :prepend => 'something before') }
-    assert_match(/<li.*>something before<a/, m)
+  it "should render :prepend options before the link" do
+    nav = @view.nav { |n| n.action('my-link', '/link', :prepend => 'something before') }
+    assert_match /<li.*>something before<a/, nav.to_s
   end
-  
-  it "should display :append options after the link" do
-    m = @view.nav { |m| m.action('my-link', '/link', :append => 'something after') }
-    assert_match(/<\/a>something after<\/li>/, m)
+
+  it "should render :append options after the link" do
+    nav = @view.nav { |n| n.action('my-link', '/link', :append => 'something after') }
+    assert_match /<\/a>something after<\/li>/, nav.to_s
   end
 
 end
