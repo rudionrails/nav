@@ -7,17 +7,32 @@ module Nav
       yield self if block_given?
     end
 
-    def action( name, options = {}, html_options = {} )
-      wrapper_options = {
-        :current => html_options.delete(:current),
-        :disabled => html_options.delete(:disabled),
-        :force_current => html_options.delete(:force_current),
-        :url => options,
-        :prepend => html_options.delete(:prepend),
-        :append => html_options.delete(:append)
-      }
+    # @example A basic action
+    #   action "Home", home_url
+    #   action "Tome, home_url, :current => true
+    #
+    # @example Given a block
+    #   action do
+    #     content_tag :span, "A simple text""
+    #   end
+    #
+    #   action :current => true do
+    #     content_tag :span, "A simple text""
+    #   end
+    def action( name = nil, options = {}, html_options = {} )
+      @actions << if block_given?
+        [ yield, name || {}, {} ]
+      else
+        wrapper_options = {
+          :current => html_options.delete(:current),
+          :disabled => html_options.delete(:disabled),
+          :force_current => html_options.delete(:force_current),
+          :prepend => html_options.delete(:prepend),
+          :append => html_options.delete(:append)
+        }
       
-      @actions << [link_to(name, options, html_options), wrapper_options, options]
+        [ link_to(name, options, html_options), wrapper_options, options ]
+      end
     end
 
     def to_s
@@ -43,13 +58,15 @@ module Nav
       after_present  = @actions.at( present_index + 1 ) if present_index < @actions.size
 
       classes = []
-      classes << "first" if @actions.first == present
-      classes << "last"  if @actions.last == present
+      classes << "first" if present == @actions.first
+      classes << "after_first" if present_index == 1
+      classes << "before_last" if present == @actions[-2]
+      classes << "last"  if present == @actions.last
       classes << "current"  if current?( *present )
       classes << "disabled" if options.delete(:disabled)
       classes << "before_current" if after_present && current?( *after_present )
       classes << "after_current"  if before_present && current?( *before_present )
-      classes << classes.join("_") if classes.any?
+      # classes << classes.join("_") if classes.any?
 
       contents = options[:prepend].to_s + contents + options[:append].to_s
 
