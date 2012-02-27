@@ -19,9 +19,9 @@ module Nav
     #   action :current => true do
     #     content_tag :span, "A simple text""
     #   end
-    def action( name = nil, options = {}, html_options = {} )
-      @actions << if block_given?
-        [ yield, name || {}, {} ]
+    def action( name = nil, options = {}, html_options = {}, &block )
+      @actions << if block
+        [ @template.capture(&block), name || {}, {} ]
       else
         wrapper_options = {
           :current => html_options.delete(:current),
