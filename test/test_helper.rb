@@ -1,5 +1,5 @@
+require 'rubygems'
 require 'minitest/autorun'
-
 
 begin
   require 'action_view'
@@ -13,5 +13,5 @@ end
 
 class MiniTest::Unit::TestCase
   include RR::Adapters::TestUnit
-  
+
 end
