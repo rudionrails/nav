@@ -71,17 +71,21 @@ module Nav
     def current?( contents, options = {}, url_for_options = {} )
       current = options[:current]
 
-      is_current = case current
-        when TrueClass then true
-        when Regexp then request_uri.match(current).nil? ? false : true
-        when Proc then current.call
-        else false
+      if current.is_a?(Array)
+        current.each { |c| current?(c) }.any?
+      else
+        is_current = case current
+          when TrueClass then true
+          when Regexp then request_uri.match(current).nil? ? false : true
+          when Proc then current.call
+          else false
+        end
+
+        return true if is_current && !options[:disabled]
+        return true if is_current || !url_for_options.is_a?(Symbol) && @template.current_page?(url_for_options) && url_for_options != {} && !options[:disabled]
+
+        false
       end
-
-      return true if is_current && !options[:disabled]
-      return true if is_current || !url_for_options.is_a?(Symbol) && @template.current_page?(url_for_options) && url_for_options != {} && !options[:disabled]
-
-      false
     end
 
     def content_tag( *args )

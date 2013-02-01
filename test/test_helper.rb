@@ -1,9 +1,10 @@
 require 'rubygems'
 require 'minitest/autorun'
 
+require 'rr'
+
 begin
   require 'action_view'
-  require 'rr'
 rescue LoadError
   STDERR.puts "Unable to run Nav tests."
 else
