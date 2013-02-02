@@ -69,23 +69,23 @@ module Nav
     end
 
     def current?( contents, options = {}, url_for_options = {} )
-      current = options[:current]
+      return false if !!options[:disabled]
+      return false unless current = options[:current]
 
       if current.is_a?(Array)
-        current.each { |c| current?(c) }.any?
+        current.map { |c| current?(contents, options.merge(current: c), url_for_options) }.any?
       else
-        is_current = case current
+        case current
           when TrueClass then true
-          when Regexp then request_uri.match(current).nil? ? false : true
+          when Regexp then !request_uri.match(current).nil?
           when Proc then current.call
-          else false
+          else current_page?(url_for_options)
         end
-
-        return true if is_current && !options[:disabled]
-        return true if is_current || !url_for_options.is_a?(Symbol) && @template.current_page?(url_for_options) && url_for_options != {} && !options[:disabled]
-
-        false
       end
+    end
+
+    def current_page?( options )
+      @template.current_page?( options )
     end
 
     def content_tag( *args )
@@ -97,7 +97,7 @@ module Nav
     end
 
     def request_uri
-      @request_uri or @request_uri = request.respond_to?(:request_uri) ? request.request_uri : request.url
+      request.respond_to?(:request_uri) ? request.request_uri : request.url
     end
 
     def request
