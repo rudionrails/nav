@@ -1,5 +1,6 @@
 module Nav
   class Builder
+
     def initialize( template, options = {} )
       @template, @options = template, options
       @actions = []
@@ -9,7 +10,7 @@ module Nav
 
     # @example A basic action
     #   action "Home", home_url
-    #   action "Tome, home_url, :current => true
+    #   action "Home, home_url, :current => true
     #
     # @example Given a block
     #   action do
@@ -19,81 +20,78 @@ module Nav
     #   action :current => true do
     #     content_tag :span, "A simple text""
     #   end
-    def action( name = nil, options = {}, html_options = {}, &block )
-      @actions << if block
-        [ @template.capture(&block), name || {}, {} ]
+    def action( name = nil, url_for_options = {}, html_options = {}, &block )
+      @actions << if block_given?
+        [@template.capture(&block), name || {}, {}]
       else
         wrapper_options = {
           :current => html_options.delete(:current),
           :disabled => html_options.delete(:disabled),
         }
 
-        [ link_to(name, options, html_options), wrapper_options, options ]
+        [link_to(name, url_for_options, html_options), wrapper_options, url_for_options]
       end
     end
 
     def to_s
-      content_tag( :ul, actions.html_safe, @options ).html_safe if actions?
+      content_tag(:ul, actions.join.html_safe, @options).html_safe
     end
 
 
     private
 
     def actions
-      @actions.collect { |a| action_wrapper(*a) }.join
+      @actions.map { |content, options, url_for_options| action_wrapper(content, options, url_for_options) }
     end
 
     def actions?
       @actions.any?
     end
 
-    def action_wrapper( contents, options = {}, url_for_options = {} )
-      present = [contents, options, url_for_options] # the one we're dealing with
-      present_index  = @actions.index( present )
+    def action_wrapper( content, options = {}, url_for_options = {} )
+      present = [content, options, url_for_options] # the one we're dealing with
+      present_index  = @actions.index(present)
 
-      before_present = @actions.at( present_index - 1 ) if present_index > 0
-      after_present  = @actions.at( present_index + 1 ) if present_index < @actions.size
+      before_present = @actions.at(present_index - 1) if present_index > 0
+      after_present  = @actions.at(present_index + 1) if present_index < @actions.size
 
-      classes = []
-      classes << options[:class] if options.key?(:class)
+      classes = [ *options[:class] ]
       classes << "first" if present == @actions.first
       classes << "after_first" if present_index == 1
       classes << "before_last" if present == @actions[-2]
-      classes << "last"  if present == @actions.last
-      classes << "current"  if current?( *present )
+      classes << "last" if present == @actions.last
+      classes << "current" if current?(*present)
       classes << "disabled" if options[:disabled]
-      classes << "before_current" if after_present && current?( *after_present )
-      classes << "after_current"  if before_present && current?( *before_present )
+      classes << "before_current" if after_present && current?(*after_present)
+      classes << "after_current"  if before_present && current?(*before_present)
 
-      content_tag :li, contents.html_safe, :class => classes.join(" ")
+      content_tag(:li, content.html_safe, :class => classes.join(" "))
     end
 
-    def current?( contents, options = {}, url_for_options = {} )
+    def current?( content, options = {}, url_for_options = {} )
       return false if !!options[:disabled]
-      return false unless current = options[:current]
 
-      if current.is_a?(Array)
-        current.map { |c| current?(contents, options.merge(current: c), url_for_options) }.any?
-      else
-        case current
-          when TrueClass then true
-          when Regexp then !request_uri.match(current).nil?
-          when Proc then current.call
-          else current_page?(url_for_options)
-        end
+      current = options[:current] || url_for_options
+
+      case current
+      when TrueClass, FalseClass then current
+      when Regexp then request_uri.match(current)
+      when Proc then current.call
+      when Array then current.map { |c| current?(content, options.merge(current: c), url_for_options) }.any?
+      else current_page?(current)
       end
     end
 
     def current_page?( options )
-      @template.current_page?( options )
+      @template.current_page?(options)
     end
 
     def content_tag( *args )
-      @template.content_tag( *args ).html_safe
+      @template.content_tag(*args).html_safe
     end
 
     def link_to( *args )
-      @template.link_to( *args ).html_safe
+      @template.link_to(*args).html_safe
     end
 
     def request_uri
@@ -103,6 +101,7 @@ module Nav
     def request
       @template.request
     end
+
   end
 end
 
