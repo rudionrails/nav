@@ -1,4 +1,3 @@
-module Nav
-  VERSION = "0.9.0"
-
+module Nav #:nodoc:
+  VERSION = '0.10.0'.freeze
 end

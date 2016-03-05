@@ -1,12 +1,10 @@
-module Nav
-
-  autoload :Builder, File.dirname(__FILE__) + '/nav/builder'
-
-  def nav( options = {}, &block )
-    Nav::Builder.new( self, options, &block ).to_s
+module Nav #:nodoc:
+  def nav(options = {}, &block)
+    Nav::Builder.new(self, options, &block).build
   end
-
 end
 
-ActionView::Base.send :include, Nav
+require File.join(File.dirname(__FILE__), 'nav', 'builder')
 
+require 'action_view/base'
+ActionView::Base.send :include, Nav
