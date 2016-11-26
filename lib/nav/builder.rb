@@ -1,11 +1,11 @@
-module Nav
-  class Builder
-
-    def initialize( template, options = {} )
-      @template, @options = template, options
+module Nav #:nodoc:
+  class Builder #:nodoc:
+    def initialize(template, options = {})
+      @template = template
+      @options = options
       @actions = []
 
-      yield self if block_given?
+      yield(self) if block_given?
     end
 
     # @example A basic action
@@ -20,55 +20,61 @@ module Nav
     #   action :current => true do
     #     content_tag :span, "A simple text""
     #   end
-    def action( name = nil, url_for_options = {}, html_options = {}, &block )
-      @actions << if block_given?
-        [@template.capture(&block), name || {}, {}]
+    def action(name = nil, url_for_options = {}, html_options = {}, &block)
+      if block_given?
+        @actions << [@template.capture(&block), name || {}, {}]
       else
+        return unless html_options.fetch(:if, true)
+        return if html_options.fetch(:unless, false)
+
         wrapper_options = {
-          :current => html_options.delete(:current),
-          :disabled => html_options.delete(:disabled),
+          current: html_options.delete(:current),
+          disabled: html_options.delete(:disabled)
         }
 
-        [link_to(name, url_for_options, html_options), wrapper_options, url_for_options]
+        @actions << [
+          link_to(name, url_for_options, html_options),
+          wrapper_options,
+          url_for_options
+        ]
       end
     end
 
-    def to_s
+    def build
+      return if @actions.empty?
       content_tag(:ul, actions.join.html_safe, @options).html_safe
     end
-
 
     private
 
     def actions
-      @actions.map { |content, options, url_for_options| action_wrapper(content, options, url_for_options) }
+      @actions.map do |content, options, url_for_options|
+        action_wrapper(content, options, url_for_options)
+      end
     end
 
-    def actions?
-      @actions.any?
-    end
-
-    def action_wrapper( content, options = {}, url_for_options = {} )
+    # rubocop:disable
+    def action_wrapper(content, options = {}, url_for_options = {})
       present = [content, options, url_for_options] # the one we're dealing with
       present_index  = @actions.index(present)
 
       before_present = @actions.at(present_index - 1) if present_index > 0
       after_present  = @actions.at(present_index + 1) if present_index < @actions.size
 
-      classes = [ *options[:class] ]
-      classes << "first" if present == @actions.first
-      classes << "after_first" if present_index == 1
-      classes << "before_last" if present == @actions[-2]
-      classes << "last" if present == @actions.last
-      classes << "current" if current?(*present)
-      classes << "disabled" if options[:disabled]
-      classes << "before_current" if after_present && current?(*after_present)
-      classes << "after_current"  if before_present && current?(*before_present)
+      classes = [*options[:class]]
+      classes << 'first' if present == @actions.first
+      classes << 'after_first' if present_index == 1
+      classes << 'before_last' if present == @actions[-2]
+      classes << 'last' if present == @actions.last
+      classes << 'current' if current?(*present)
+      classes << 'disabled' if options[:disabled]
+      classes << 'before_current' if after_present && current?(*after_present)
+      classes << 'after_current'  if before_present && current?(*before_present)
 
-      content_tag(:li, content.html_safe, :class => classes.join(" "))
+      content_tag(:li, content.html_safe, class: classes.join(' '))
     end
 
-    def current?( content, options = {}, url_for_options = {} )
+    def current?(content, options = {}, url_for_options = {})
       return false if !!options[:disabled]
 
       current = options[:current] || url_for_options
@@ -82,15 +88,15 @@ module Nav
       end
     end
 
-    def current_page?( options )
+    def current_page?(options)
       @template.current_page?(options)
     end
 
-    def content_tag( *args )
+    def content_tag(*args)
       @template.content_tag(*args).html_safe
     end
 
-    def link_to( *args )
+    def link_to(*args)
       @template.link_to(*args).html_safe
     end
 
@@ -101,7 +107,5 @@ module Nav
     def request
       @template.request
     end
-
   end
 end
-

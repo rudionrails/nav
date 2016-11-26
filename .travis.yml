@@ -1,0 +1,9 @@
+language: ruby
+script:
+  - bundle exec rubocop
+  - bundle exec rspec
+
+
+notifications:
+  on_success: change
+  on_failure: change
