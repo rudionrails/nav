@@ -18,7 +18,7 @@ RSpec.describe Nav::Builder do
     end
 
     before do
-      allow(builder).to receive(:current_page?) { false }
+      allow(view).to receive(:current_page?) { false }
     end
 
     it 'renders <ul> with :id attribute' do

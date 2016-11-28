@@ -22,7 +22,11 @@ module Nav #:nodoc:
     #   end
     def action(name = nil, url_for_options = {}, html_options = {}, &block)
       if block_given?
-        @actions << [@template.capture(&block), name || {}, {}]
+        @actions << [
+          @template.capture(&block),
+          name || {},
+          {}
+        ]
       else
         return unless html_options.fetch(:if, true)
         return if html_options.fetch(:unless, false)
@@ -33,7 +37,7 @@ module Nav #:nodoc:
         }
 
         @actions << [
-          link_to(name, url_for_options, html_options),
+          @template.link_to(name, url_for_options, html_options),
           wrapper_options,
           url_for_options
         ]
@@ -42,7 +46,7 @@ module Nav #:nodoc:
 
     def build
       return if @actions.empty?
-      content_tag(:ul, actions.join.html_safe, @options).html_safe
+      @template.content_tag(:ul, actions.join.html_safe, @options).html_safe
     end
 
     private
@@ -71,7 +75,7 @@ module Nav #:nodoc:
       classes << 'before_current' if after_present && current?(*after_present)
       classes << 'after_current'  if before_present && current?(*before_present)
 
-      content_tag(:li, content.html_safe, class: classes.join(' '))
+      @template.content_tag(:li, content.html_safe, class: classes.join(' '))
     end
 
     def current?(content, options = {}, url_for_options = {})
@@ -84,20 +88,8 @@ module Nav #:nodoc:
       when Regexp then request_uri.match(current)
       when Proc then current.call
       when Array then current.map { |c| current?(content, options.merge(current: c), url_for_options) }.any?
-      else current_page?(current)
+      else @template.current_page?(current)
       end
-    end
-
-    def current_page?(options)
-      @template.current_page?(options)
-    end
-
-    def content_tag(*args)
-      @template.content_tag(*args).html_safe
-    end
-
-    def link_to(*args)
-      @template.link_to(*args).html_safe
     end
 
     def request_uri
